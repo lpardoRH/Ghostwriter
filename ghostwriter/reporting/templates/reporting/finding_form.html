@@ -96,3 +96,9 @@
 {% block tabforms %}
     {{ block.super }}
 {% endblock %}
+
+{% block morescripts %}
+  {% load static %}
+  <script src="{% static 'js/cvsscalc31.js' %}"></script>
+  <script src="{% static 'js/cvsscalculator.js' %}"></script>
+{% endblock %}

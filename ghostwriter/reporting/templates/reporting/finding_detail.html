@@ -1,5 +1,7 @@
 {% extends "base_generic.html" %}
 
+{% load custom_tags %}
+
 {% load bleach_tags %}
 
 {% block pagetitle %}{{ finding.title }} Details{% endblock %}
@@ -101,6 +103,27 @@
                         {{ finding.impact|bleach }}
                     {% else %}
                         <p>Impact write-up is needed.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- CVSS -->
+        <div class="card">
+            <div class="card-header" id="cvss" data-toggle="collapse" data-target="#collapseCvss" aria-expanded="true">
+                <a class="accordion-toggle btn btn-link icon cvss-icon" data-toggle="collapse" data-target="#collapseCvss" aria-expanded="false" aria-controls="collapseCvss">
+                    CVSS Score
+                </a>
+            </div>
+            <div>
+            </div>
+            <div id="collapseCvss" class="finding-collapse collapse show" aria-labelledby="cvss">
+                <div class="finding-card card-body">
+                    {% if finding.cvss_score %}
+                        {{ finding.cvss_vector|bleach }} - 
+                        {{ finding.cvss_score|bleach }}
+                    {% else %}
+                        <p>CVSS score is needed</p>
                     {% endif %}
                 </div>
             </div>

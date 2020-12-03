@@ -126,6 +126,20 @@ class Finding(models.Model):
         null=True,
         blank=True,
     )
+    cvss_score = models.CharField(
+        "CVSS Score",
+        max_length=255,
+        help_text="Calculate the cvss score",
+        null=True,
+        blank=True,
+    )
+    cvss_vector = models.CharField(
+        "CVSS Vector",
+        max_length=255,
+        help_text="Calculate the cvss vector",
+        null=True,
+        blank=True,
+    )
     mitigation = models.TextField(
         "Mitigation",
         null=True,
@@ -416,6 +430,18 @@ class ReportFindingLink(models.Model):
         null=True,
         blank=True,
         help_text="Describe the impact of this finding on the affected entities",
+    )
+    cvss_vector = models.TextField(
+        "CVSS Vector",
+        help_text="Calculate the cvss vector",
+        null=True,
+        blank=True,
+    )
+    cvss_score = models.TextField(
+        "CVSS Score",
+        help_text="Calculate the cvss score",
+        null=True,
+        blank=True,
     )
     mitigation = models.TextField(
         "Mitigation",
