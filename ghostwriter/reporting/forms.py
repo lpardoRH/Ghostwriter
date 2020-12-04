@@ -270,8 +270,8 @@ class ReportFindingLinkUpdateForm(forms.ModelForm):
                 """
             ),
             Div(template="reporting/cvss_calculator.html"),
-            Field("cvss_score", css_class="enable-evidence-upload"),
-            Field("cvss_vector", css_class="enable-evidence-upload"),
+            "cvss_score",
+            "cvss_vector",
             Field("mitigation", css_class="enable-evidence-upload"),
             Field("replication_steps", css_class="enable-evidence-upload"),
             Field("host_detection_techniques", css_class="enable-evidence-upload"),

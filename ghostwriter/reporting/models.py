@@ -431,14 +431,16 @@ class ReportFindingLink(models.Model):
         blank=True,
         help_text="Describe the impact of this finding on the affected entities",
     )
-    cvss_vector = models.TextField(
+    cvss_vector = models.CharField(
         "CVSS Vector",
+        max_length=255,
         help_text="Calculate the cvss vector",
         null=True,
         blank=True,
     )
-    cvss_score = models.TextField(
+    cvss_score = models.CharField(
         "CVSS Score",
+        max_length=255,
         help_text="Calculate the cvss score",
         null=True,
         blank=True,
