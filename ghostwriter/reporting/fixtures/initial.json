@@ -2,94 +2,57 @@
     "model": "reporting.severity",
     "pk": 1,
     "fields": {
-      "severity": "Informational",
-      "weight": 5,
-      "color": "8EAADB"
+      "severity": "Low",
+      "weight": 4,
+      "color": "72767b"
     }
   },
   {
     "model": "reporting.severity",
     "pk": 2,
     "fields": {
-      "severity": "Low",
-      "weight": 4,
-      "color": "A8D08D"
+      "severity": "Moderate",
+      "weight": 3,
+      "color": "f5c12e"
     }
   },
   {
     "model": "reporting.severity",
     "pk": 3,
     "fields": {
-      "severity": "Medium",
-      "weight": 3,
-      "color": "F4B083"
+      "severity": "Important",
+      "weight": 2,
+      "color": "ec7a08"
     }
   },
   {
     "model": "reporting.severity",
     "pk": 4,
     "fields": {
-      "severity": "High",
-      "weight": 2,
-      "color": "FF7E79"
-    }
-  },
-  {
-    "model": "reporting.severity",
-    "pk": 5,
-    "fields": {
       "severity": "Critical",
       "weight": 1,
-      "color": "966FD6"
+      "color": "a30000"
     }
   },
   {
     "model": "reporting.findingtype",
     "pk": 1,
     "fields": {
-      "finding_type": "Network"
+      "finding_type": "Vulnerability"
     }
   },
   {
     "model": "reporting.findingtype",
     "pk": 2,
     "fields": {
-      "finding_type": "Physical"
+      "finding_type": "Weakness"
     }
   },
   {
     "model": "reporting.findingtype",
     "pk": 3,
     "fields": {
-      "finding_type": "Wireless"
-    }
-  },
-  {
-    "model": "reporting.findingtype",
-    "pk": 4,
-    "fields": {
-      "finding_type": "Web"
-    }
-  },
-  {
-    "model": "reporting.findingtype",
-    "pk": 5,
-    "fields": {
-      "finding_type": "Mobile"
-    }
-  },
-  {
-    "model": "reporting.findingtype",
-    "pk": 6,
-    "fields": {
-      "finding_type": "Cloud"
-    }
-  },
-  {
-    "model": "reporting.findingtype",
-    "pk": 7,
-    "fields": {
-      "finding_type": "Host"
+      "finding_type": "Informational"
     }
   },
   {
