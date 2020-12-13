@@ -279,6 +279,8 @@ class Reportwriter:
                 ] = "<p>Must Be Provided</p>"
             report_dict["findings"][finding.id]["description"] = finding.description
             report_dict["findings"][finding.id]["impact"] = finding.impact
+            report_dict["findings"][finding.id]["cvss_score"] = finding.cvss_score
+            report_dict["findings"][finding.id]["cvss_vector"] = finding.cvss_vector
             report_dict["findings"][finding.id]["recommendation"] = finding.mitigation
             report_dict["findings"][finding.id][
                 "replication_steps"
@@ -1716,6 +1718,12 @@ class Reportwriter:
                 finding["description"], finding
             )
             finding["impact_rt"] = render_subdocument(finding["impact"], finding)
+            finding["cvss_score_rt"] = render_subdocument(
+                finding["cvss_score"], finding
+            )
+            finding["cvss_vector_rt"] = render_subdocument(
+                finding["cvss_vector"], finding
+            )
             finding["recommendation_rt"] = render_subdocument(
                 finding["recommendation"], finding
             )
@@ -1883,6 +1891,14 @@ class Reportwriter:
 
             # Impact
             self.process_text_xlsx(finding["impact"], wrap_format, finding)
+            self.col += 1
+
+            # CVSS score
+            self.process_text_xlsx(finding["cvss_score"], wrap_format, finding)
+            self.col += 1
+
+            # CVSS vector
+            self.process_text_xlsx(finding["cvss_vector"], wrap_format, finding)
             self.col += 1
 
             # Recommendation
@@ -2134,6 +2150,8 @@ class Reportwriter:
                 "\x0D", ""
             )
             impact = BeautifulSoup(finding["impact"], "lxml").text.replace("\x0D", "")
+            cvss_score = BeautifulSoup(finding["cvss_score"], "lxml").text.replace("\x0D", "")
+            cvss_vector = BeautifulSoup(finding["cvss_score"], "lxml").text.replace("\x0D", "")
             recommendation = BeautifulSoup(
                 finding["recommendation"], "lxml"
             ).text.replace("\x0D", "")
