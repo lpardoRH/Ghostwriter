@@ -1381,6 +1381,39 @@ def convert_finding(request, pk):
 
 
 @login_required
+def add_scope_domain(request, pk):
+    """
+    Adds a domain to :model:`reporting.Report`
+
+    **Template**
+
+    :template:`reporting/report_domain.html`
+    """
+
+    try:
+        report = Report.objects.get(pk=pk)
+    except Exception:
+        messages.error(
+            request,
+            "A valid report could not be found for this blank finding",
+            extra_tags="alert-danger",
+        )
+        return HttpResponseRedirect(reverse("reporting:reports"))
+
+    domain_link = ScopeDomain(
+        scope_domain=request.GET.get('domain', None),
+        report=report,
+    )
+    domain_link.save()
+    messages.success(
+        request,
+        "Domain added to the report",
+        extra_tags="alert-success",
+    )
+    return HttpResponseRedirect(reverse("reporting:report_detail", args=(report.id,)))
+
+
+@login_required
 def export_findings_to_csv(request):
     """
     Export all :model:`reporting.Finding` to a csv file for download.
