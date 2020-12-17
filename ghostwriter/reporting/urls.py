@@ -128,6 +128,11 @@ urlpatterns += [
         name="assign_blank_finding",
     ),
     path(
+        "reports/domain/add/<int:pk>",
+        views.add_scope_domain,
+        name="add_scope_domain",
+    ),
+    path(
         "reports/template/<int:pk>",
         views.ReportTemplateDetailView.as_view(),
         name="template_detail",

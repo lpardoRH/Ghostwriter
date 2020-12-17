@@ -331,6 +331,57 @@ class ReportTemplate(models.Model):
         return result_code
 
 
+class ScopeDomain(models.Model):
+
+    scope_domain = models.CharField(
+        "Domain",
+        max_length=255,
+        default="Domain",
+        help_text="Tested domains",
+    )
+    report = models.ForeignKey("Report", on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"{self.domain}"
+
+
+class EndpointType(models.Model):
+    """
+    Stores an individual domain type.
+    """
+
+    endpoint_type = models.CharField(
+        "Type", max_length=255, unique=True, help_text="Type of Endpoint (e.g. API, UI)"
+    )
+
+    class Meta:
+        ordering = ["endpoint_type"]
+        verbose_name = "Endpoint type"
+        verbose_name_plural = "Endpoint types"
+
+    def __str__(self):
+        return f"{self.endpoint_type}"
+
+
+class DomainEndpoint(models.Model):
+    domain_endpoint = models.CharField(
+        "Endpoint",
+        max_length=255,
+        null=True,
+        help_text="Tested endpoint",
+    )
+    domain = models.ForeignKey("ScopeDomain", on_delete=models.CASCADE, null=True)
+    endpoint_type = models.ForeignKey(
+        "EndpointType",
+        models.SET_NULL,
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return f"{self.domain_endpoint}"
+
+
 class Report(models.Model):
     """
     Stores an individual report, related to :model:`rolodex.Project` and :model:`users.User`.

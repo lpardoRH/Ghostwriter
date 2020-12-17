@@ -1,0 +1,54 @@
+<!-- Domains Section -->
+<div style="margin-left: 20px; margin-top: 40px">
+    <h4><i class="fab fa-searchengin"></i> Scope</h4>
+    <hr>
+
+    <p>Add domains <i class="far fa-plus-square"></i> button next to your desired finding.</p>
+
+    <div class="search detail-page-search">
+        <form action="{% url 'reporting:findings' %}" method="GET">
+            <div class="input-group">
+                <input id="domain" autocomplete="off" type="text" class="form-control" name="domain" placeholder="Add Domain" aria-label="domains" aria-describedby="add-domain">
+                <a id="add-domain" href=""><i class="far fa-plus-square"></i></a>
+            </div>
+            <input type="submit" style="display: none" />
+        </form>
+    </div>
+
+    <!-- Scope Table Section -->
+        <table id="scope-table" class="roundedCorners">
+            <tr>
+                <th>Domain</th>
+                <th>Category</th>
+                <th>Endpoint</th>
+            </tr>
+            <tbody>
+              {% for domain in domains%}
+              <tr><td>{{ domain.domain }}</td></tr>
+              {% endfor %}
+            </tbody>
+
+        </table>
+
+
+{% block javascript %}
+<script>
+$("#add-domain").on("click", function (){
+
+  $.ajax({
+            type: 'GET',
+            url: "{% url 'reporting:add_domain' report.id %}",
+            data: {
+              domain:$("#domain").val()
+            },
+            success: function (response) {
+              alert("saved")
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+})
+</script>
+{% endblock javascript %}
