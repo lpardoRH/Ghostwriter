@@ -133,6 +133,16 @@ urlpatterns += [
         name="add_scope_domain",
     ),
     path(
+        "reports/endpoint/add/<int:pk>",
+        views.add_scope_endpoint,
+        name="add_scope_endpoint",
+    ),
+    path(
+        "reports/endpoint/delete>",
+        views.delete_scope_endpoint,
+        name="delete_scope_endpoint",
+    ),
+    path(
         "reports/template/<int:pk>",
         views.ReportTemplateDetailView.as_view(),
         name="template_detail",

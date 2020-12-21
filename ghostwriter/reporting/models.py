@@ -342,7 +342,7 @@ class ScopeDomain(models.Model):
     report = models.ForeignKey("Report", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"{self.domain}"
+        return f"{self.scope_domain}"
 
 
 class EndpointType(models.Model):
@@ -377,9 +377,6 @@ class DomainEndpoint(models.Model):
         blank=True,
         null=True
     )
-
-    def __str__(self):
-        return f"{self.domain_endpoint}"
 
 
 class Report(models.Model):

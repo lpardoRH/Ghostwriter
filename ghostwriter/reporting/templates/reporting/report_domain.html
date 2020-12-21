@@ -3,50 +3,139 @@
     <h4><i class="fab fa-searchengin"></i> Scope</h4>
     <hr>
 
-    <p>Add domains <i class="far fa-plus-square"></i> button next to your desired finding.</p>
+    <p>Add Domains</p>
+    <div class="form-row">
+      <div class="domain add-domain form-group col-md-3 mb-0">
+          <div class="input-group">
+              <input id="domain" autocomplete="off" type="text" class="form-control" name="domain" placeholder="Add Domain" aria-label="domains" aria-describedby="add-domain">
+          </div>
+      </div>
+      <a id="add-domain" href=""><i class="far fa-plus-square"></i></a>
+    </div>
 
-    <div class="search detail-page-search">
-        <form action="{% url 'reporting:findings' %}" method="GET">
-            <div class="input-group">
-                <input id="domain" autocomplete="off" type="text" class="form-control" name="domain" placeholder="Add Domain" aria-label="domains" aria-describedby="add-domain">
-                <a id="add-domain" href=""><i class="far fa-plus-square"></i></a>
-            </div>
-            <input type="submit" style="display: none" />
-        </form>
+    <p>Add Endpoints</p>
+    <div class="form-row">
+      <div class="endpoint form-group col-md-3 mb-0">
+        <select class="select form-control" name="endpoint-domain" id="endpoint-domain">
+          <option value="">-- Select a domain --</option>
+          {% for domain in domains %}
+          <option value="{{ domain.id }}">{{ domain }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="endpoint form-group col-md-3 mb-0">
+        <select class="select form-control" name="endpoint-type" id="endpoint-type">
+          <option value="">-- Select an endpoint type --</option>
+          {% for endpoint_type in endpoint_types %}
+          <option value="{{ endpoint_type.id }}">{{ endpoint_type }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-5 mb-0">
+        <input id="endpoint" autocomplete="off" type="text" class="form-control" name="endpoint" placeholder="Add Endpoint" aria-label="endpoints" aria-describedby="add-scope-endpoint">
+      </div>
+      <a id="add-scope-endpoint" href=""><i class="far fa-plus-square"></i></a>
+
     </div>
 
     <!-- Scope Table Section -->
-        <table id="scope-table" class="roundedCorners">
-            <tr>
-                <th>Domain</th>
-                <th>Category</th>
-                <th>Endpoint</th>
-            </tr>
+        <table id="scope-domain-table" class="roundedCorners">
+          <thead>
+              <tr>
+                  <th>Domain</th>
+                  <th>Category</th>
+                  <th>Endpoint</th>
+                  <th></th>
+              </tr>
+            </thead>
             <tbody>
-              {% for domain in domains%}
-              <tr><td>{{ domain.domain }}</td></tr>
+              {% for endpoint in endpoints %}
+                <tr id="endpoint-{{ endpoint.id }}">
+                  <td>{{ endpoint.domain }}</td>
+                  <td>{{ endpoint.endpoint_type }}</td>
+                  <td>{{ endpoint.domain_endpoint }}</td>
+                  <td>
+                    <a href="" class="delete-domain" data-id="{{ endpoint.id }}"><i style="color: red" class="far fa-trash-alt"></i> Delete</a>
+                  </td>
+                </tr>
               {% endfor %}
             </tbody>
-
         </table>
 
 
 {% block javascript %}
 <script>
-$("#add-domain").on("click", function (){
-
+$("#add-domain").on("click", function (e){
+  e.preventDefault();
+  if(!$("#domain").val()){
+    return false;
+  }
   $.ajax({
             type: 'GET',
-            url: "{% url 'reporting:add_domain' report.id %}",
+            url: "{% url 'reporting:add_scope_domain' report.id %}",
             data: {
               domain:$("#domain").val()
             },
-            success: function (response) {
-              alert("saved")
+            success: function (data) {
+              displayToastTop({type:data['result'], string:data['message'], title:'Domain added'});
+              $("#endpoint-domain").append(new Option(data.domain, data.id))
             },
             error: function (response) {
-                // alert the error if any error occured
-                alert(response["responseJSON"]["error"]);
+              // alert the error if any error occured
+              console.log(response);
+            }
+        })
+})
+
+$("#add-scope-endpoint").on("click", function (e){
+  e.preventDefault();
+  if(!$("#endpoint-domain").val() || !$("#endpoint-type").val() || !$("#endpoint").val()){
+    return false;
+  }
+  $.ajax({
+            type: 'GET',
+            url: "{% url 'reporting:add_scope_endpoint' report.id %}",
+            data: {
+              domain: $("#endpoint-domain").val(),
+              endpoint_type: $("#endpoint-type").val(),
+              endpoint: $("#endpoint").val()
+            },
+            success: function (data) {
+              displayToastTop({type:data['result'], string:data['message'], title:'Endpoint added'});
+              $("#scope-domain-table tr:last").after(' \
+              <tr id="endpoint-' + data.id + '"> \
+                  <td>' + data.domain + "</td> \
+                  <td>" + data.endpoint_type + "</td> \
+                  <td>" + data.endpoint + '</td> \
+                  <td><a href="" class="delete-domain" data-id="' + data.id + '"> \
+                    <i style="color: red" class="far fa-trash-alt"></i> Delete</a> \
+                  </td> \
+                </tr> \
+              ')
+            },
+            error: function (response) {
+              // alert the error if any error occured
+              console.log(response);
+            }
+        })
+})
+
+$("#scope-domain-table").on("click", ".delete-domain", function (e){
+  e.preventDefault();
+  id = $(this).attr('data-id')
+  $.ajax({
+            type: 'GET',
+            url: "{% url 'reporting:delete_scope_endpoint' %}",
+            data: {
+              id: id,
+            },
+            success: function (data) {
+              displayToastTop({type:data['result'], string:data['message'], title:'Domain deleted'});
+              $("#endpoint-" + id).remove()
+            },
+            error: function (response) {
+              // alert the error if any error occured
+              console.log(response);
             }
         })
 })

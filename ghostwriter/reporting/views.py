@@ -1400,8 +1400,9 @@ def add_scope_domain(request, pk):
         )
         return HttpResponseRedirect(reverse("reporting:reports"))
 
+    domain = request.GET.get('domain', None)
     domain_link = ScopeDomain(
-        scope_domain=request.GET.get('domain', None),
+        scope_domain=domain,
         report=report,
     )
     domain_link.save()
@@ -1410,7 +1411,78 @@ def add_scope_domain(request, pk):
         "Domain added to the report",
         extra_tags="alert-success",
     )
-    return HttpResponseRedirect(reverse("reporting:report_detail", args=(report.id,)))
+    data = {
+        "result": "success",
+        'message': 'Domain added to the report',
+        'id': domain_link.id,
+        'domain': domain
+    }
+    return JsonResponse(data)
+
+@login_required
+def add_scope_endpoint(request, pk):
+    """
+    Adds a domain to :model:`reporting.Report`
+
+    **Template**
+
+    :template:`reporting/report_domain.html`
+    """
+
+    try:
+        report = Report.objects.get(pk=pk)
+    except Exception:
+        messages.error(
+            request,
+            "A valid report could not be found for this blank finding",
+            extra_tags="alert-danger",
+        )
+        return HttpResponseRedirect(reverse("reporting:reports"))
+
+    endpoint_link = DomainEndpoint(
+        domain=ScopeDomain.objects.get(pk=request.GET.get('domain')),
+        domain_endpoint=request.GET.get('endpoint'),
+        endpoint_type=EndpointType.objects.get(pk=request.GET.get('endpoint_type'))
+    )
+    endpoint_link.save()
+    endpoint_data = DomainEndpoint.objects.select_related("domain", "endpoint_type").get(pk=endpoint_link.id)
+
+    messages.success(
+        request,
+        "Endpoint added to the report",
+        extra_tags="alert-success",
+    )
+    data = {
+        "result": "success",
+        'message': 'Endpoint added to the report',
+        'id':endpoint_link.id,
+        'domain': endpoint_data.domain.scope_domain,
+        'endpoint_type': endpoint_data.endpoint_type.endpoint_type,
+        'endpoint': endpoint_data.domain_endpoint,
+    }
+    return JsonResponse(data)
+
+def delete_scope_endpoint(request):
+    """
+    Deletes a domain endpoint from :model:`reporting.Report`
+
+    **Template**
+
+    :template:`reporting/report_domain.html`
+    """
+
+    DomainEndpoint.objects.get(pk=request.GET.get('id')).delete()
+
+    messages.success(
+        request,
+        "Endpoint deleted",
+        extra_tags="alert-success",
+    )
+    data = {
+        "result": "success",
+        'message': 'Endpoint deleted from report',
+    }
+    return JsonResponse(data)
 
 
 @login_required
@@ -1577,7 +1649,12 @@ class ReportDetailView(LoginRequiredMixin, DetailView):
             Q(doc_type__doc_type="pptx") & Q(client=self.object.project.client)
             | Q(client__isnull=True)
         )
+        report_id = self.kwargs.get("pk")
         ctx["form"] = form
+        ctx["domains"] = ScopeDomain.objects.filter(report_id=report_id).order_by("scope_domain")
+        ctx["endpoint_types"] = EndpointType.objects.all().order_by("endpoint_type")
+        ctx["endpoints"] = DomainEndpoint.objects.all().select_related().filter(domain__report_id=report_id).order_by("domain_endpoint")
+
         return ctx
 
 
