@@ -66,6 +66,9 @@ from .models import (
     ReportTemplate,
     Severity,
     ScopeDomain,
+    EndpointType,
+    DomainEndpoint,
+    ScopeDomain,
 )
 from .resources import FindingResource
 
