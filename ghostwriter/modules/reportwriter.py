@@ -1695,6 +1695,9 @@ class Reportwriter:
         context["findings"] = self.report_json["findings"].values()
         context["total_findings"] = len(self.report_json["findings"].values())
 
+        # Report Scope
+        context["scope"] = self.report_json["scope"].values()
+
         # Generate the XML for the styled findings
         context = self.process_findings(context)
 
