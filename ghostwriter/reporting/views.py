@@ -1076,10 +1076,11 @@ def generate_json(request, pk):
     Generate a JSON report for an individual :model:`reporting.Report`.
     """
     report_instance = get_object_or_404(Report, pk=pk)
+    scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
     output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
     evidence_path = os.path.join(settings.MEDIA_ROOT)
     engine = reportwriter.Reportwriter(
-        report_instance, output_path, evidence_path, template_loc=None
+        report_instance, scope_instance, output_path, evidence_path, template_loc=None
     )
     json_report = engine.generate_json()
     return HttpResponse(json_report, "application/json")

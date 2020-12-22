@@ -378,6 +378,9 @@ class DomainEndpoint(models.Model):
         null=True
     )
 
+    def __str__(self):
+        return f"{self.domain_endpoint}"
+
 
 class Report(models.Model):
     """
