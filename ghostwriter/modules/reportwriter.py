@@ -90,11 +90,12 @@ class Reportwriter:
     image_extensions = ["png", "jpeg", "jpg"]
     text_extensions = ["txt", "ps1", "py", "md", "log"]
 
-    def __init__(self, report_queryset, output_path, evidence_path, template_loc=None):
+    def __init__(self, report_queryset, scope_instance, output_path, evidence_path, template_loc=None):
         self.output_path = output_path
         self.template_loc = template_loc
         self.evidence_path = evidence_path
         self.report_queryset = report_queryset
+        self.scope_instance = scope_instance
 
         # Get the global report configuration
         global_report_config = ReportConfiguration.get_solo()
@@ -447,6 +448,21 @@ class Reportwriter:
             ] = operator.start_date
             report_dict["team"][operator.operator.id]["end_date"] = operator.end_date
             report_dict["team"][operator.operator.id]["note"] = operator.note
+
+
+        report_dict["scope"] = {}
+        for domain in self.scope_instance.values(
+                'domain__scope_domain',
+                'endpoint_type__endpoint_type',
+                'domain_endpoint',
+                'pk'
+            ):
+
+            report_dict["scope"][domain['pk']] = {}
+            report_dict["scope"][domain['pk']]["domain"] = domain['domain__scope_domain']
+            report_dict["scope"][domain['pk']]["endpoint"] = domain['domain_endpoint']
+            report_dict["scope"][domain['pk']]["endpoint_type"] = domain['endpoint_type__endpoint_type']
+
         return json.dumps(report_dict, indent=2, cls=DjangoJSONEncoder)
 
     def make_figure(self, par, ref=None):
@@ -1678,6 +1694,9 @@ class Reportwriter:
         # Findings information
         context["findings"] = self.report_json["findings"].values()
         context["total_findings"] = len(self.report_json["findings"].values())
+
+        # Report Scope
+        context["scope"] = self.report_json["scope"].values()
 
         # Generate the XML for the styled findings
         context = self.process_findings(context)

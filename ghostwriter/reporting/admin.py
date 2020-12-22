@@ -17,6 +17,9 @@ from .models import (
     ReportFindingLink,
     ReportTemplate,
     Severity,
+    ScopeDomain,
+    DomainEndpoint,
+    EndpointType,
 )
 from .resources import FindingResource
 
@@ -185,3 +188,15 @@ class ReportTemplateAdmin(admin.ModelAdmin):
             {"fields": ("protected",)},
         ),
     )
+
+@admin.register(EndpointType)
+class EndpointTypeAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ScopeDomain)
+class DomainAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(DomainEndpoint)
+class DomainEndpointAdmin(admin.ModelAdmin):
+    pass
