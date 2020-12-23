@@ -864,6 +864,7 @@ def generate_docx(request, pk):
     """
     try:
         report_instance = Report.objects.get(pk=pk)
+        scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
         output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
         evidence_path = os.path.join(settings.MEDIA_ROOT)
         report_name = generate_report_name(report_instance)
@@ -892,7 +893,7 @@ def generate_docx(request, pk):
 
         # Template available and passes linting checks, so proceed with generation
         engine = reportwriter.Reportwriter(
-            report_instance, output_path, evidence_path, template_loc
+            report_instance, scope_instance, output_path, evidence_path, template_loc
         )
 
         docx = engine.generate_word_docx()
@@ -958,12 +959,13 @@ def generate_xlsx(request, pk):
     """
     try:
         report_instance = Report.objects.get(pk=pk)
+        scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
         output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
         evidence_path = os.path.join(settings.MEDIA_ROOT)
         report_name = generate_report_name(report_instance)
 
         engine = reportwriter.Reportwriter(
-            report_instance, output_path, evidence_path, template_loc=None
+            report_instance, scope_instance, output_path, evidence_path, template_loc=None
         )
         output = io.BytesIO()
         workbook = Workbook(output, {"in_memory": True})
@@ -998,6 +1000,7 @@ def generate_pptx(request, pk):
     """
     try:
         report_instance = Report.objects.get(pk=pk)
+        scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
         output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
         evidence_path = os.path.join(settings.MEDIA_ROOT)
         report_name = generate_report_name(report_instance)
@@ -1013,7 +1016,7 @@ def generate_pptx(request, pk):
         template_loc = report_template.document.path
 
         engine = reportwriter.Reportwriter(
-            report_instance, output_path, evidence_path, template_loc
+            report_instance, scope_instance, output_path, evidence_path, template_loc
         )
         pptx = engine.generate_powerpoint_pptx()
         response = HttpResponse(
@@ -1093,6 +1096,7 @@ def generate_all(request, pk):
     """
     try:
         report_instance = Report.objects.get(pk=pk)
+        scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
         output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
         evidence_path = os.path.join(settings.MEDIA_ROOT)
         report_name = generate_report_name(report_instance)
@@ -1117,7 +1121,7 @@ def generate_all(request, pk):
         pptx_template = pptx_template.document.path
 
         engine = reportwriter.Reportwriter(
-            report_instance, output_path, evidence_path, template_loc=None
+            report_instance, scope_instance, output_path, evidence_path, template_loc=None
         )
         json_doc, word_doc, excel_doc, ppt_doc = engine.generate_all_reports(
             docx_template, pptx_template
@@ -1221,6 +1225,7 @@ def archive(request, pk):
         report_instance = Report.objects.select_related(
             "project", "project__client"
         ).get(pk=pk)
+        scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
         output_path = os.path.join(settings.MEDIA_ROOT, report_instance.title)
         evidence_path = os.path.join(settings.MEDIA_ROOT)
         archive_loc = os.path.join(settings.MEDIA_ROOT, "archives")
@@ -1242,7 +1247,7 @@ def archive(request, pk):
             )
 
         engine = reportwriter.Reportwriter(
-            report_instance, output_path, evidence_path, template_loc=None
+            report_instance, scope_instance, output_path, evidence_path, template_loc=None
         )
         json_doc, word_doc, excel_doc, ppt_doc = engine.generate_all_reports(
             docx_template, pptx_template
@@ -1329,6 +1334,7 @@ def clone_report(request, pk):
     report_instance = ReportFindingLink.objects.select_related("report").filter(
         report=pk
     )
+    scope_instance = DomainEndpoint.objects.filter(domain__report_id=pk)
     # Clone the report by editing title, setting PK to `None`, and saving it
     report_to_clone = report_instance[0].report
     report_to_clone.title = report_to_clone.title + " Copy"
