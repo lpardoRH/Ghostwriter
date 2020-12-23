@@ -192,8 +192,14 @@ class Reportwriter:
         Export a report as a JSON dictionary for archiving and to generate other report types.
         """
         project_name = str(self.report_queryset.project)
-        # Client data
+
+
         report_dict = {}
+
+        # Report data
+        report_dict["report"] = {}
+        report_dict["report"] = str(self.report_queryset)
+        # Client data
         report_dict["client"] = {}
         report_dict["client"]["id"] = self.report_queryset.project.client.id
         report_dict["client"]["full_name"] = self.report_queryset.project.client.name
@@ -1654,6 +1660,7 @@ class Reportwriter:
 
         # Prepare the ``context`` dict for the Word template rendering
         context = {}
+        context["report"] = self.report_json["report"]
         context["report_date"] = datetime.now().strftime("%B %d, %Y")
         context["report_date_uk"] = datetime.now().strftime("%d %B %Y")
 
@@ -1664,7 +1671,6 @@ class Reportwriter:
 
         # Assessment information
         context["assessment_name"] = self.report_json["project"]["name"]
-        context["assessment_codename"] = self.report_json["project"]["codename"]
         context["assessment_type"] = self.report_json["project"]["project_type"]
         context["project_type"] = context["assessment_type"]
         context["company"] = self.company_config.company_name
