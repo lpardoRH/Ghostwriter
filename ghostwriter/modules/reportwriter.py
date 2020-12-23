@@ -261,6 +261,7 @@ class Reportwriter:
             report_dict["findings"][finding.id] = {}
             report_dict["findings"][finding.id]["title"] = finding.title
             report_dict["findings"][finding.id]["severity"] = finding.severity.severity
+            report_dict["findings"][finding.id]["finding_type"] = str(finding.finding_type)
             report_dict["findings"][finding.id][
                 "severity_color"
             ] = finding.severity.color
@@ -1663,6 +1664,7 @@ class Reportwriter:
 
         # Assessment information
         context["assessment_name"] = self.report_json["project"]["name"]
+        context["assessment_codename"] = self.report_json["project"]["codename"]
         context["assessment_type"] = self.report_json["project"]["project_type"]
         context["project_type"] = context["assessment_type"]
         context["company"] = self.company_config.company_name
@@ -1728,6 +1730,9 @@ class Reportwriter:
             # Create ``RichText()`` object for a colored severity category
             finding["severity_rt"] = RichText(
                 finding["severity"], color=finding["severity_color"]
+            )
+            finding["finding_type_rt"] = render_subdocument(
+                finding["finding_type"], finding
             )
             # Create subdocuments for each finding section
             finding["affected_entities_rt"] = render_subdocument(
