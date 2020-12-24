@@ -279,8 +279,10 @@ class Reportwriter:
                 ] = "<p>Must Be Provided</p>"
             report_dict["findings"][finding.id]["description"] = finding.description
             report_dict["findings"][finding.id]["impact"] = finding.impact
-            report_dict["findings"][finding.id]["cvss_score"] = finding.cvss_score
-            report_dict["findings"][finding.id]["cvss_vector"] = finding.cvss_vector
+            report_dict["findings"][finding.id]["cvss_score"] =
+                finding.cvss_score if finding.cvss_score else ""
+            report_dict["findings"][finding.id]["cvss_vector"] =
+                finding.cvss_vector if finding.cvss_vector else ""
             report_dict["findings"][finding.id]["recommendation"] = finding.mitigation
             report_dict["findings"][finding.id][
                 "replication_steps"
@@ -2151,7 +2153,7 @@ class Reportwriter:
             )
             impact = BeautifulSoup(finding["impact"], "lxml").text.replace("\x0D", "")
             cvss_score = BeautifulSoup(finding["cvss_score"], "lxml").text.replace("\x0D", "")
-            cvss_vector = BeautifulSoup(finding["cvss_score"], "lxml").text.replace("\x0D", "")
+            cvss_vector = BeautifulSoup(finding["cvss_vector"], "lxml").text.replace("\x0D", "")
             recommendation = BeautifulSoup(
                 finding["recommendation"], "lxml"
             ).text.replace("\x0D", "")
