@@ -287,10 +287,8 @@ class Reportwriter:
                 ] = "<p>Must Be Provided</p>"
             report_dict["findings"][finding.id]["description"] = finding.description
             report_dict["findings"][finding.id]["impact"] = finding.impact
-            report_dict["findings"][finding.id]["cvss_score"] =
-                finding.cvss_score if finding.cvss_score else ""
-            report_dict["findings"][finding.id]["cvss_vector"] =
-                finding.cvss_vector if finding.cvss_vector else ""
+            report_dict["findings"][finding.id]["cvss_score"] = finding.cvss_score if finding.cvss_score else ""
+            report_dict["findings"][finding.id]["cvss_vector"] = finding.cvss_vector if finding.cvss_vector else ""
             report_dict["findings"][finding.id]["recommendation"] = finding.mitigation
             report_dict["findings"][finding.id][
                 "replication_steps"
