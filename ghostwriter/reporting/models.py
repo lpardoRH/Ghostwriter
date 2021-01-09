@@ -496,6 +496,20 @@ class ReportFindingLink(models.Model):
         null=True,
         blank=True,
     )
+    internal_tracker = models.CharField(
+        "Internal Task",
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Add the internal task link",
+    )
+    external_tracker = models.CharField(
+        "External Flaw",
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Add the external flaw/jira link",
+    )
     mitigation = models.TextField(
         "Mitigation",
         null=True,

@@ -289,6 +289,8 @@ class Reportwriter:
             report_dict["findings"][finding.id]["impact"] = finding.impact
             report_dict["findings"][finding.id]["cvss_score"] = finding.cvss_score if finding.cvss_score else ""
             report_dict["findings"][finding.id]["cvss_vector"] = finding.cvss_vector if finding.cvss_vector else ""
+            report_dict["findings"][finding.id]["external_tracker"] = finding.external_tracker if finding.external_tracker else ""
+            report_dict["findings"][finding.id]["internal_tracker"] = finding.internal_tracker if finding.internal_tracker else ""
             report_dict["findings"][finding.id]["recommendation"] = finding.mitigation
             report_dict["findings"][finding.id][
                 "replication_steps"
@@ -1754,6 +1756,12 @@ class Reportwriter:
             finding["cvss_vector_rt"] = render_subdocument(
                 finding["cvss_vector"], finding
             )
+            finding["internal_tracker_rt"] = RichText(
+                finding["internal_tracker"].rpartition("/")[2], url_id=self.word_doc.build_url_id(finding["internal_tracker"])
+            )
+            finding["external_tracker_rt"] = RichText(
+                finding["external_tracker"].rpartition("/")[2], url_id=self.word_doc.build_url_id(finding["external_tracker"])
+            )
             finding["recommendation_rt"] = render_subdocument(
                 finding["recommendation"], finding
             )
@@ -1929,6 +1937,14 @@ class Reportwriter:
 
             # CVSS vector
             self.process_text_xlsx(finding["cvss_vector"], wrap_format, finding)
+            self.col += 1
+
+            # CVSS vector
+            self.process_text_xlsx(finding["external_tracker"], wrap_format, finding)
+            self.col += 1
+
+            # CVSS vector
+            self.process_text_xlsx(finding["internal_tracker"], wrap_format, finding)
             self.col += 1
 
             # Recommendation
@@ -2182,6 +2198,8 @@ class Reportwriter:
             impact = BeautifulSoup(finding["impact"], "lxml").text.replace("\x0D", "")
             cvss_score = BeautifulSoup(finding["cvss_score"], "lxml").text.replace("\x0D", "")
             cvss_vector = BeautifulSoup(finding["cvss_vector"], "lxml").text.replace("\x0D", "")
+            external_tracker = BeautifulSoup(finding["external_tracker"], "lxml").text.replace("\x0D", "")
+            internal_tracker = BeautifulSoup(finding["internal_tracker"], "lxml").text.replace("\x0D", "")
             recommendation = BeautifulSoup(
                 finding["recommendation"], "lxml"
             ).text.replace("\x0D", "")

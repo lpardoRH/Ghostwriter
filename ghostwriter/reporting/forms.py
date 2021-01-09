@@ -255,6 +255,11 @@ class ReportFindingLinkUpdateForm(forms.ModelForm):
                 Column("severity", css_class="form-group col-md-6 mb-0"),
                 css_class="form-row",
             ),
+            Row(
+                Column("internal_tracker", css_class="form-group col-md-6 mb-0"),
+                Column("external_tracker", css_class="form-group col-md-6 mb-0"),
+                css_class="form-row",
+            ),
             HTML(
                 """
                 <h6 class="icon pencil-icon">Description</h6>
