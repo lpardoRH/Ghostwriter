@@ -53,7 +53,18 @@
             <a title="Mark report as delivered" href="javascript:void(0)" class="clickable-link js-toggle-delivery-status" toggle-delivery-status-csrftoken="{{ csrf_token }}" toggle-delivery-status-url="{% url 'reporting:ajax_toggle_report_delivery' report.id %}" toggle-delivery-status-id="{{ report.id }}"><i id="js-delivery-status-icon" class="fas fa-toggle-off"></i></a>
         {% endif %}
     </h6>
-
+    <div style="margin-left: 20px; margin-top: 40px">
+        <h4><i class="fab fa-searchengin"></i> Version</h4>
+        <hr>
+        <div class="form-row">
+          <div class="version form-group col-md-3 mb-0">
+              <div class="input-group">
+                  <input id="tested-version" value="{{ report.tested_version }}" autocomplete="off" type="text" class="form-control" name="version" placeholder="Add Tested Version" aria-label="version" aria-describedby="add-version">
+              </div>
+          </div>
+          <button class="btn btn-primary" id="add-tested-version" href="">SAVE</button>
+        </div>
+    </div>
     {% include "reporting/report_domain.html" %}
 
     <!-- Findings Section -->
@@ -626,6 +637,30 @@
                 });
             });
         });
+    </script>
+
+    <!-- Save Tested App version -->
+    <script>
+      $("#add-tested-version").on("click", function (e){
+        e.preventDefault();
+        if(!$("#tested-version").val()){
+          return false;
+        }
+        $.ajax({
+                  type: 'GET',
+                  url: "{% url 'reporting:add_tested_version' report.id %}",
+                  data: {
+                    tested_version: $("#tested-version").val(),
+                  },
+                  success: function (data) {
+                    displayToastTop({type:data['result'], string:data['message'], title:'Version saved'});
+                  },
+                  error: function (response) {
+                    // alert the error if any error occured
+                    console.log(response);
+                  }
+              })
+      })
     </script>
 
     {% comment %} Include the reusable delete confirmation modal and related scripts {% endcomment %}

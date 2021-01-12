@@ -199,6 +199,7 @@ class Reportwriter:
         # Report data
         report_dict["report"] = {}
         report_dict["report"] = str(self.report_queryset)
+        report_dict["tested_version"] = str(self.report_queryset.tested_version)
         # Client data
         report_dict["client"] = {}
         report_dict["client"]["id"] = self.report_queryset.project.client.id
@@ -1665,6 +1666,7 @@ class Reportwriter:
         context["report"] = self.report_json["report"]
         context["report_date"] = datetime.now().strftime("%B %d, %Y")
         context["report_date_uk"] = datetime.now().strftime("%d %B %Y")
+        context["tested_version"] = self.report_json["tested_version"]
 
         # Client information
         context["client"] = self.report_json["client"]["full_name"]

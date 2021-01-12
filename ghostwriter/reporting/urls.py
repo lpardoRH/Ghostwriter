@@ -143,6 +143,11 @@ urlpatterns += [
         name="delete_scope_endpoint",
     ),
     path(
+        "reports/tested_version/add/<int:pk>",
+        views.add_tested_version,
+        name="add_tested_version",
+    ),
+    path(
         "reports/template/<int:pk>",
         views.ReportTemplateDetailView.as_view(),
         name="template_detail",

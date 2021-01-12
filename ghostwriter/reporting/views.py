@@ -1494,6 +1494,41 @@ def delete_scope_endpoint(request):
     }
     return JsonResponse(data)
 
+@login_required
+def add_tested_version(request, pk):
+    """
+    Adds a domain to :model:`reporting.Report`
+
+    **Template**
+
+    :template:`reporting/report_detail.html`
+    """
+
+    try:
+        report = Report.objects.get(pk=pk)
+    except Exception:
+        messages.error(
+            request,
+            "A valid report could not be found for this blank finding",
+            extra_tags="alert-danger",
+        )
+        return HttpResponseRedirect(reverse("reporting:reports"))
+    report.tested_version = request.GET.get('tested_version')
+    report.save()
+
+    messages.success(
+        request,
+        "Version saved successfully",
+        extra_tags="alert-success",
+    )
+    data = {
+        "result": "success",
+        'message': 'Version saved in report',
+        'report': report.id,
+        'version': report.tested_version
+    }
+
+    return JsonResponse(data)
 
 @login_required
 def export_findings_to_csv(request):

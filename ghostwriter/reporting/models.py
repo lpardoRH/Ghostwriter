@@ -405,6 +405,12 @@ class Report(models.Model):
     archived = models.BooleanField(
         "Archived", default=False, help_text="Mark the report as archived"
     )
+    tested_version = models.CharField(
+        "Tested Version",
+        max_length=255,
+        null = True,
+        help_text="Provide the tested version for this report",
+    )
     # Foreign Keys
     project = models.ForeignKey(
         "rolodex.Project",
@@ -436,6 +442,7 @@ class Report(models.Model):
     delivered = models.BooleanField(
         "Delivered", default=False, help_text="Delivery status of the report"
     )
+
 
     class Meta:
         ordering = ["-creation", "-last_update", "project"]
