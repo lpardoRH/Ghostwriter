@@ -105,6 +105,17 @@ class ReportConfiguration(SingletonModel):
         blank=True,
         help_text="Select a default Word template",
     )
+    default_docx_finding_template = models.ForeignKey(
+        "reporting.reporttemplate",
+        related_name="reportconfiguration_finding_docx_set",
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "doc_type__doc_type__iexact": "docx",
+        },
+        null=True,
+        blank=True,
+        help_text="Select a default Word Finding template",
+    )
     default_pptx_template = models.ForeignKey(
         "reporting.reporttemplate",
         related_name="reportconfiguration_pptx_set",

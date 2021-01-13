@@ -409,6 +409,7 @@ class Report(models.Model):
         "Tested Version",
         max_length=255,
         null = True,
+        blank = True,
         help_text="Provide the tested version for this report",
     )
     # Foreign Keys
@@ -427,6 +428,16 @@ class Report(models.Model):
         },
         null=True,
         help_text="Select the Word template to use for this report",
+    )
+    docx_finding_template = models.ForeignKey(
+        "ReportTemplate",
+        related_name="reporttemplate_finding_docx_set",
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "doc_type__doc_type__iexact": "docx",
+        },
+        null=True,
+        help_text="Select the Word template to use for this report findings",
     )
     pptx_template = models.ForeignKey(
         "ReportTemplate",

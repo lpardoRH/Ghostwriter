@@ -231,6 +231,7 @@ urlpatterns += [
 # URLs for generating reports
 urlpatterns += [
     path("reports/<int:pk>/generate_docx/", views.generate_docx, name="generate_docx"),
+    path("reports/<int:pk>/generate_docx/<int:finding_id>", views.generate_docx, name="generate_docx"),
     path("reports/<int:pk>/generate_xlsx/", views.generate_xlsx, name="generate_xlsx"),
     path("reports/<int:pk>/generate_pptx/", views.generate_pptx, name="generate_pptx"),
     path("reports/<int:pk>/generate_json/", views.generate_json, name="generate_json"),

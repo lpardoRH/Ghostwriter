@@ -185,12 +185,13 @@
                                                 <a class="js-set-finding-status" href="javascript:void(0);" set-finding-status-csrftoken="{{ csrf_token }}" set-finding-status-url="{% url 'reporting:ajax_set_finding_status' finding.id 'edit' %}" set-finding-status="edit" set-finding-status-id="{{ finding.id }}"><i style="color: darkorange" class="fas fa-toggle-off"></i> Flag for Editing</a>
                                                 <a class="js-set-finding-status" href="javascript:void(0);" set-finding-status-csrftoken="{{ csrf_token }}" set-finding-status-url="{% url 'reporting:ajax_set_finding_status' finding.id 'complete' %}" set-finding-status="complete" set-finding-status-id="{{ finding.id }}"><i style="color: green" class="fas fa-toggle-on"></i> Mark as Complete</a>
                                                 <a href="{% url 'reporting:convert_finding' finding.id %}"><i class="far fa-copy"></i> Clone to Library</a>
+                                                <a href="{{ report.id }}/generate_docx/{{ finding.id }}" data-report-id="{{ report.id }}" data-finding-id="{{ finding.id }}" class="js-generate-report local_finding_generate_docx"><i class="fas fa-download"></i> Generate Docx</a>
                                                 <a id="finding-delete-button-{{ finding.id }}" class="js-confirm-delete" data-toggle="modal" data-target="#confirm-delete-modal" href="javascript:void(0);" delete-target-csrftoken="{{ csrf_token }}" delete-target-url="{% url 'reporting:ajax_delete_local_finding' finding.id%}" delete-target-id="{{ finding.id }}" delete-target-type="finding"><i style="color: red;" class="far fa-trash-alt"></i> Delete</a>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
-                            {% endfor %}
+                            {% endfor %}attr
                         {% else %}
                             <tr id="{{ group|lower }}_placeholder" data-id="{{ group|lower }}_placeholder" class="severity-row-placeholder">
                                 <td colspan="7" scope="colgroup">Add {{ group }} findings or drag-and-drop a finding here to update its severity.</td>
@@ -597,6 +598,7 @@
             $('#report-template-swap-form').change( function() {
                 var url = $(this).attr('action');
                 var docxTemplateId = $('#id_docx_template').val();
+                var docxFindingTemplateId = $('#id_docx_finding_template').val();
                 var pptxTemplateId = $('#id_pptx_template').val();
                 var csrftoken = $('input[name=csrfmiddlewaretoken]').val();
                 if ($('#id_pptx_template').val() == '') {
@@ -604,6 +606,9 @@
                 }
                 if ($('#id_docx_template').val() == '') {
                     docxTemplateId = -1
+                }
+                if ($('#id_docx_finding_template').val() == '') {
+                    docxFindingTemplateId = -1
                 }
                 // Prep AJAX request with CSRF token
                 $.ajaxSetup({
@@ -620,6 +625,7 @@
                     dataType: 'json',
                     data: {
                         'docx_template': docxTemplateId,
+                        'docx_finding_template': docxFindingTemplateId,
                         'pptx_template': pptxTemplateId,
                         'csrfmiddlewaretoken': csrftoken,
                     },
@@ -662,6 +668,8 @@
               })
       })
     </script>
+
+
 
     {% comment %} Include the reusable delete confirmation modal and related scripts {% endcomment %}
     {% include "confirm_delete_modal.html" %}

@@ -171,8 +171,9 @@ class ReportForm(forms.ModelForm):
                 """
             ),
             Row(
-                Column("docx_template", css_class="form-group col-md-6 mb-0"),
-                Column("pptx_template", css_class="form-group col-md-6 mb-0"),
+                Column("docx_template", css_class="form-group col-md-4 mb-0"),
+                Column("docx_finding_template", css_class="form-group col-md-4 mb-0"),
+                Column("pptx_template", css_class="form-group col-md-4 mb-0"),
                 css_class="form-row",
             ),
             ButtonHolder(
@@ -558,19 +559,21 @@ class ReportTemplateForm(forms.ModelForm):
 
 class SelectReportTemplateForm(forms.ModelForm):
     """
-    Modify the ``docx_template`` and ``pptx_template`` values of an individual
+    Modify the ``docx_template``, `docx_finding_template` and ``pptx_template`` values of an individual
     :model:`reporting.Report`.
     """
 
     class Meta:
         model = Report
-        fields = ("docx_template", "pptx_template")
+        fields = ("docx_template", "docx_finding_template", "pptx_template")
 
     def __init__(self, *args, **kwargs):
         super(SelectReportTemplateForm, self).__init__(*args, **kwargs)
         self.fields["docx_template"].help_text = None
+        self.fields["docx_finding_template"].help_text = None
         self.fields["pptx_template"].help_text = None
         self.fields["docx_template"].empty_label = "-- Select a Word Template --"
+        self.fields["docx_finding_template"].empty_label = "-- Select a Word Template for Findings --"
         self.fields["pptx_template"].empty_label = "-- Select a PPT Template --"
         # Design form layout with Crispy FormHelper
         self.helper = FormHelper()
@@ -583,5 +586,6 @@ class SelectReportTemplateForm(forms.ModelForm):
         )
         self.helper.layout = Layout(
             Field("docx_template", css_class="col-md-4 offset-md-4"),
+            Field("docx_finding_template", css_class="col-md-4 offset-md-4"),
             Field("pptx_template", css_class="col-md-4 offset-md-4"),
         )

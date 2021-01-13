@@ -84,7 +84,6 @@ logger = logging.getLogger(__name__)
 # AJAX Functions #
 ##################
 
-
 @login_required
 def ajax_update_template_lint_results(request, pk):
     """
@@ -500,16 +499,49 @@ class ReportTemplateSwap(LoginRequiredMixin, SingleObjectMixin, View):
 
     model = Report
 
+    def checkDocxTemplate(self, templateQuery):
+        data = {}
+        try:
+            template_status = templateQuery.get_status()
+            data["lint_result"] = template_status
+            if template_status != "success":
+                if template_status == "warning":
+                    data[
+                        "docx_lint_message"
+                    ] = "Selected Word template has warnings from linter. Check the template before generating a report."
+                elif template_status == "error":
+                    data[
+                        "docx_lint_message"
+                    ] = "Selected Word template has linting errors and cannot be used to generate a report."
+                elif template_status == "failed":
+                    data[
+                        "docx_lint_message"
+                    ] = "Selected Word template failed basic linter checks and can't be used to generate a report."
+                else:
+                    data[
+                        "docx_lint_message"
+                    ] = "Selected Word template has an unknown linter status. Check and lint the template before generating a report."
+        except Exception:
+            logger.exception("Failed to get the template status")
+            data[
+                "docx_lint_message"
+            ] = "Could not retrieve the Word template's linter status. Check and lint the template before generating a report."
+
+        return data
+
     def post(self, *args, **kwargs):
         self.object = self.get_object()
         docx_template_id = self.request.POST.get("docx_template", None)
+        docx_finding_template_id = self.request.POST.get("docx_finding_template", None)
         pptx_template_id = self.request.POST.get("pptx_template", None)
-        if docx_template_id and pptx_template_id:
+        if docx_template_id and pptx_template_id and docx_finding_template_id:
             docx_template_query = None
+            docx_finding_template_query = None
             pptx_template_query = None
             try:
                 docx_template_id = int(docx_template_id)
                 pptx_template_id = int(pptx_template_id)
+                docx_finding_template_id = int(docx_finding_template_id)
 
                 if docx_template_id == -1:
                     pass
@@ -518,6 +550,14 @@ class ReportTemplateSwap(LoginRequiredMixin, SingleObjectMixin, View):
                         pk=docx_template_id
                     )
                     self.object.docx_template = docx_template_query
+
+                if docx_finding_template_id == -1:
+                    pass
+                else:
+                    docx_finding_template_query = ReportTemplate.objects.get(
+                        pk=docx_finding_template_id
+                    )
+                    self.object.docx_finding_template = docx_finding_template_query
 
                 if pptx_template_id == -1:
                     pass
@@ -530,33 +570,14 @@ class ReportTemplateSwap(LoginRequiredMixin, SingleObjectMixin, View):
                 self.object.save()
 
                 data = {"result": "success", "message": "Template successfully swapped"}
+
                 # Check template for linting issues
-                try:
-                    if docx_template_query:
-                        template_status = docx_template_query.get_status()
-                        data["lint_result"] = template_status
-                        if template_status != "success":
-                            if template_status == "warning":
-                                data[
-                                    "docx_lint_message"
-                                ] = "Selected Word template has warnings from linter. Check the template before generating a report."
-                            elif template_status == "error":
-                                data[
-                                    "docx_lint_message"
-                                ] = "Selected Word template has linting errors and cannot be used to generate a report."
-                            elif template_status == "failed":
-                                data[
-                                    "docx_lint_message"
-                                ] = "Selected Word template failed basic linter checks and can't be used to generate a report."
-                            else:
-                                data[
-                                    "docx_lint_message"
-                                ] = "Selected Word template has an unknown linter status. Check and lint the template before generating a report."
-                except Exception:
-                    logger.exception("Failed to get the template status")
-                    data[
-                        "docx_lint_message"
-                    ] = "Could not retrieve the Word template's linter status. Check and lint the template before generating a report."
+                if docx_template_query:
+                    data.update (self.checkDocxTemplate(docx_template_query))
+
+                if docx_finding_template_query:
+                    data.update(self.checkDocxTemplate(docx_finding_template_query))
+
                 try:
                     if pptx_template_query:
                         template_status = pptx_template_query.get_status()
@@ -858,7 +879,7 @@ def generate_report_name(report_instance):
 
 
 @login_required
-def generate_docx(request, pk):
+def generate_docx(request, pk, finding_id=None):
     """
     Generate a Word document report for an individual :model:`reporting.Report`.
     """
@@ -870,14 +891,24 @@ def generate_docx(request, pk):
         report_name = generate_report_name(report_instance)
 
         # Get the template for this report
-        if report_instance.docx_template:
-            report_template = report_instance.docx_template
+        if finding_id is not None:
+            if report_instance.docx_finding_template:
+                report_template = report_instance.docx_finding_template
+            else:
+                report_config = ReportConfiguration.get_solo()
+                report_template = report_config.default_docx_finding_template
+                if not report_template:
+                    raise MissingTemplate
+            template_loc = report_template.document.path
         else:
-            report_config = ReportConfiguration.get_solo()
-            report_template = report_config.default_docx_template
-            if not report_template:
-                raise MissingTemplate
-        template_loc = report_template.document.path
+            if report_instance.docx_template:
+                report_template = report_instance.docx_template
+            else:
+                report_config = ReportConfiguration.get_solo()
+                report_template = report_config.default_docx_template
+                if not report_template:
+                    raise MissingTemplate
+            template_loc = report_template.document.path
 
         # Check template's linting status
         template_status = report_template.get_status()
@@ -896,7 +927,12 @@ def generate_docx(request, pk):
             report_instance, scope_instance, output_path, evidence_path, template_loc
         )
 
-        docx = engine.generate_word_docx()
+        if finding_id is not None:
+            docx = engine.generate_word_docx(finding_id)
+        else:
+            docx = engine.generate_word_docx()
+
+
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
@@ -1687,6 +1723,10 @@ class ReportDetailView(LoginRequiredMixin, DetailView):
         ctx = super(ReportDetailView, self).get_context_data(**kwargs)
         form = SelectReportTemplateForm(instance=self.object)
         form.fields["docx_template"].queryset = ReportTemplate.objects.filter(
+            Q(doc_type__doc_type="docx") & Q(client=self.object.project.client)
+            | Q(client__isnull=True)
+        )
+        form.fields["docx_finding_template"].queryset = ReportTemplate.objects.filter(
             Q(doc_type__doc_type="docx") & Q(client=self.object.project.client)
             | Q(client__isnull=True)
         )

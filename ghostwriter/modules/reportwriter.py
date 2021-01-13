@@ -266,6 +266,7 @@ class Reportwriter:
         report_dict["findings"] = {}
         for finding in self.report_queryset.reportfindinglink_set.all():
             report_dict["findings"][finding.id] = {}
+            report_dict["findings"][finding.id]["id"] = finding.id
             report_dict["findings"][finding.id]["title"] = finding.title
             report_dict["findings"][finding.id]["severity"] = finding.severity.severity
             report_dict["findings"][finding.id]["finding_type"] = str(finding.finding_type)
@@ -1612,10 +1613,12 @@ class Reportwriter:
                             tag_name,
                         )
 
-    def generate_word_docx(self):
+    def generate_word_docx(self, finding_id=None):
         """
         Generate a complete Word document for the current report.
         """
+
+        #from ghostwriter.reporting.models import ReportFindingLink
         # Generate the JSON for the report
         self.report_json = json.loads(self.generate_json())
         # Create Word document writer using the specified template file
@@ -1704,14 +1707,22 @@ class Reportwriter:
         ].values()
 
         # Findings information
-        context["findings"] = self.report_json["findings"].values()
-        context["total_findings"] = len(self.report_json["findings"].values())
+        if finding_id is not None:
+            context["findings"] = []
+            context["findings"].append(self.report_json["findings"].get(str(finding_id)))
+            context["total_findings"] = 1
+            #context["findings"] = self.report_json["findings"][str(finding_id)].values_list()
+        else:
+            context["findings"] = self.report_json["findings"].values()
+            context["total_findings"] = len(self.report_json["findings"].values())
+
+
+        # Generate the XML for the styled findings
+        context = self.process_findings(context)
 
         # Report Scope
         context["scope"] = self.report_json["scope"].values()
 
-        # Generate the XML for the styled findings
-        context = self.process_findings(context)
 
         # Render the Word document + auto-escape any unsafe XML/HTML
         self.word_doc.render(context, self.jinja_env, autoescape=True)
